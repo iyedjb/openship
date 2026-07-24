@@ -13,7 +13,7 @@ COPY tsconfig.base.json ./
 COPY packages/ ./packages/
 COPY apps/ ./apps/
 
-RUN bun install --production=false && cd apps/dashboard && bun run build
+RUN bun install && cd apps/dashboard && bun run build
 
 # ─── Production stage ──────────────────────────────────
 FROM node:22-alpine AS runner

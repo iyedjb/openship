@@ -17,7 +17,7 @@ COPY apps/ ./apps/
 # rebuild doesn't re-fetch the graph. (Cache mount needs BuildKit — Compose v2
 # enables it by default.)
 RUN --mount=type=cache,target=/root/.bun/install/cache \
-    bun install --frozen-lockfile --production=false \
+    bun install --frozen-lockfile \
  && cd apps/api && bun run build
 
 # ─── Production stage ──────────────────────────────────
