@@ -8,6 +8,7 @@
  */
 import { registerTunnelAutostart } from "../ssh-tunnel-manager";
 import { registerSelfAdoptReconcile } from "./self-deploy";
+import { registerSeedAdmin } from "./seed-admin";
 
 export function registerStartupHooks(): void {
   // Desktop: re-open saved port-forward tunnels marked auto-start.
@@ -15,4 +16,6 @@ export function registerStartupHooks(): void {
   // Self-app: reconcile the control-plane adopt deployment + route/port/cert +
   // public URL on every boot (backfills existing installs; heals port drift).
   registerSelfAdoptReconcile();
+  // Seed admin: create ADMIN_EMAIL/ADMIN_PASSWORD user on first boot if set.
+  registerSeedAdmin();
 }
