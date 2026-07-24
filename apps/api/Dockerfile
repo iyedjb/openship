@@ -3,6 +3,7 @@
 # Pin bun (was :latest — non-deterministic; drifted to 1.3.14) to .bun-version.
 FROM oven/bun:1.3.10 AS builder
 WORKDIR /app
+ENV NODE_ENV=development
 
 COPY package.json bun.lock pnpm-workspace.yaml ./
 COPY tsconfig.base.json ./
@@ -16,7 +17,7 @@ COPY apps/ ./apps/
 # rebuild doesn't re-fetch the graph. (Cache mount needs BuildKit — Compose v2
 # enables it by default.)
 RUN --mount=type=cache,target=/root/.bun/install/cache \
-    bun install --frozen-lockfile \
+    bun install --frozen-lockfile --production=false \
  && cd apps/api && bun run build
 
 # ─── Production stage ──────────────────────────────────

@@ -1,14 +1,15 @@
 # ─── Build stage ────────────────────────────────────────
 FROM oven/bun:latest AS builder
 WORKDIR /app
+ENV NODE_ENV=development
+ENV NEXT_TELEMETRY_DISABLED=1
 
 COPY package.json bun.lock pnpm-workspace.yaml ./
 COPY tsconfig.base.json ./
 COPY packages/ ./packages/
 COPY apps/ ./apps/
 
-ENV NEXT_TELEMETRY_DISABLED=1
-RUN bun install && cd apps/web && bun run build
+RUN bun install --production=false && cd apps/web && bun run build
 
 # ─── Production stage ──────────────────────────────────
 FROM node:22-alpine AS runner
