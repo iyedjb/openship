@@ -250,7 +250,7 @@ function TabBar({
             )}
           >
             <Icon className="size-4" strokeWidth={2} />
-            {t.emailsAdmin.panel.tabs[tab.key]}
+            {(t.emailsAdmin.panel.tabs as Record<string, string>)[tab.key] || (tab.key === "api-keys" ? "API & Keys" : tab.key)}
             {isActive && (
               <span className="absolute bottom-0 start-0 end-0 h-0.5 bg-primary rounded-full" />
             )}
