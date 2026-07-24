@@ -8,8 +8,8 @@ COPY tsconfig.base.json ./
 COPY packages/ ./packages/
 COPY apps/ ./apps/
 
-RUN --mount=type=cache,target=/root/.bun/install/cache \
-    bun install || bun install \
+RUN --mount=type=cache,target=/tmp/bun-cache \
+    BUN_INSTALL_CACHE_DIR=/tmp/bun-cache bun install \
  && cd apps/web && bun run build
 
 # ─── Production stage ──────────────────────────────────
