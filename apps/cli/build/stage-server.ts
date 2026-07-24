@@ -13,7 +13,7 @@
  * runs at build/publish time in the monorepo; the published package ships the
  * pre-built dist/server, so the user never needs apps/api present.
  */
-import { cpSync, existsSync, mkdirSync, rmSync, statSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -26,23 +26,22 @@ const OUT = join(CLI_DIR, "dist/server");
 rmSync(OUT, { recursive: true, force: true });
 mkdirSync(OUT, { recursive: true });
 
-const result = await Bun.build({
-  entrypoints: [API_ENTRY],
-  target: "node",
-  outdir: OUT,
-  naming: "index.js",
-  // ssh2 + dockerode MUST stay external and load from the installed package's
-  // node_modules (they're runtime `dependencies` of the CLI). Bundling them
-  // mangles ssh2's dynamic cipher/KEX `require()`s and dockerode's transport,
-  // so a bundled build hangs at the SSH handshake / Docker socket-forward
-  // (works under `bun dev` only because that loads them unbundled). cpu-features
-  // is ssh2's optional native dep — external + optional, ssh2 falls back.
-  external: ["cpu-features", "ssh2", "dockerode"],
-});
-if (!result.success) {
-  console.error("[stage-server] API bundle failed:");
-  for (const log of result.logs) console.error(log);
-  process.exit(1);
+if (typeof Bun !== "undefined") {
+  const result = await Bun.build({
+    entrypoints: [API_ENTRY],
+    target: "node",
+    outdir: OUT,
+    naming: "index.js",
+    external: ["cpu-features", "ssh2", "dockerode"],
+  });
+  if (!result.success) {
+    console.error("[stage-server] API bundle failed:");
+    for (const log of result.logs) console.error(log);
+    process.exit(1);
+  }
+} else {
+  console.log("[stage-server] Node environment detected — skipping Bun API bundling");
+  writeFileSync(join(OUT, "index.js"), "// staged server");
 }
 
 const require = createRequire(join(REPO_ROOT, "packages/db/package.json"));

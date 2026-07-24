@@ -25,7 +25,7 @@
     "README.md"
   ],
   "scripts": {
-    "build": "tsup && bun run build/stage-server.ts",
+    "build": "tsup && node --import tsx build/stage-server.ts",
     "cli": "bun dist/index.js",
     "dev": "bun run build && bun run build/stage-dashboard.ts && OPENSHIP_DASHBOARD_DIR=\"$(cd ../dashboard/.next/standalone && pwd)\" bun dist/index.js",
     "lint": "tsc --noEmit",

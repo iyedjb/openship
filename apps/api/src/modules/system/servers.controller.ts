@@ -42,7 +42,22 @@ export async function listServers(c: Context) {
 
   // Org-scoped: only the caller's org's servers.
   const ctx = getRequestContext(c);
-  const all = await repos.server.listByOrganization(ctx.organizationId);
+  let all = await repos.server.listByOrganization(ctx.organizationId);
+  if (all.length === 0) {
+    try {
+      const defaultServer = await repos.server.create({
+        organizationId: ctx.organizationId,
+        name: "Local Server",
+        sshHost: "localhost",
+        sshPort: 22,
+        sshUser: "root",
+        sshAuthMethod: "password",
+      });
+      all = [defaultServer];
+    } catch {
+      // ignore
+    }
+  }
   await primeGeo();
   // Projects currently deployed to each server (active deployment → meta.serverId).
   const projectCounts = await repos.project

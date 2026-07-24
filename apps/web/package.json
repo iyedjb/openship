@@ -4,7 +4,7 @@
   "license": "Apache-2.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --port 3009",
+    "dev": "next dev -H localhost --port 3009",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",

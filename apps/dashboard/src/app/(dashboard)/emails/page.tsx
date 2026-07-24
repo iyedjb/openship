@@ -346,7 +346,7 @@ export default function EmailsPage() {
       if (servers.length === 0) {
         const allServers = await systemApi.listServers().catch(() => []);
         if (cancelled) return;
-        if (allServers.length === 1) {
+        if (allServers.length >= 1) {
           const opt = await loadServerOption(allServers[0].id);
           if (cancelled) return;
           if (opt) setSelectedServer(opt);

@@ -480,6 +480,7 @@ export class SshConnectionManager {
 
     const server = await repos.server.get(serverId).catch(() => undefined);
     if (!server?.sshHost) return false;
+    if (server.sshHost === "localhost" || server.sshHost === "127.0.0.1") return true;
 
     const ok = await probeTcp(server.sshHost, server.sshPort ?? 22, timeoutMs);
     if (ok) this.recordSuccess(serverId);
@@ -600,6 +601,12 @@ export class SshConnectionManager {
     const server = await repos.server.get(serverId);
     if (!server?.sshHost) {
       throw new Error("No server configured");
+    }
+
+    if (server.sshHost === "localhost" || server.sshHost === "127.0.0.1") {
+      const executor = createExecutor();
+      debugSsh(`connect:local-executor-prepared server=${serverId} (${formatDuration(startedAt)}) host=${server.sshHost}`);
+      return executor;
     }
 
     const sshConfig = await buildSshConfig(server);

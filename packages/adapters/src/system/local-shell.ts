@@ -43,10 +43,16 @@ export function logEntry(
 }
 
 export function getLocalShellPath(): string {
+  if (process.platform === "win32") {
+    return process.env.ComSpec || "cmd.exe";
+  }
   return process.env.SHELL?.trim() || "/bin/sh";
 }
 
 export function getLocalShellArgs(command: string): string[] {
+  if (process.platform === "win32") {
+    return ["/d", "/s", "/c", command];
+  }
   const shellName = basename(getLocalShellPath());
 
   if (shellName === "bash" || shellName === "zsh") {

@@ -8,7 +8,7 @@
 // loading, matching the old `--env-file` behavior.
 import { existsSync } from "node:fs";
 
-const file = process.env.ENV_FILE;
+const file = process.env.ENV_FILE || ".env";
 if (file && existsSync(file)) {
   process.loadEnvFile(file);
 }

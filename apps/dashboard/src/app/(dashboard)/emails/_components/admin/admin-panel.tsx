@@ -31,6 +31,7 @@ import {
   Settings,
   DatabaseBackup,
   Waypoints,
+  Key,
   type LucideIcon,
 } from "lucide-react";
 import type { MailSetupStatus } from "@/lib/api";
@@ -47,6 +48,7 @@ import { SendingTab } from "./sending-tab";
 import { AdvancedTab } from "./advanced-tab";
 import { WelcomeModal } from "./welcome-modal";
 import { ReputationBanner } from "./reputation-banner";
+import { ApiKeyIntegrationCard } from "./api-key-card";
 
 const WELCOME_SEEN_PREFIX = "openship:mail:welcome-seen:";
 
@@ -60,6 +62,7 @@ interface MailAdminPanelProps {
 
 type TabKey =
   | "overview"
+  | "api-keys"
   | "domains"
   | "mailboxes"
   | "dns"
@@ -76,6 +79,7 @@ interface TabDef {
 
 const TABS: TabDef[] = [
   { key: "overview", icon: LayoutDashboard },
+  { key: "api-keys", icon: Key },
   { key: "domains", icon: Globe },
   { key: "mailboxes", icon: UserRound },
   { key: "dns", icon: FileText },
@@ -147,6 +151,9 @@ export function MailAdminPanel({ status, serverId, onRefresh, onForgotten }: Mai
       <div>
         {tab === "overview" && (
           <OverviewTab status={status} serverId={serverId} onRefresh={onRefresh} />
+        )}
+        {tab === "api-keys" && (
+          <ApiKeyIntegrationCard domain={primaryDomain} serverId={serverId} />
         )}
         {tab === "domains" && (
           <DomainsTab

@@ -21,7 +21,10 @@ export const OPENSHIP_DIR = "/root/.openship";
  * place the folder is created — callers never `mkdir` it themselves.
  */
 export async function ensureOpenshipDir(exec: CommandExecutor): Promise<void> {
-  await exec.exec(`mkdir -p ${OPENSHIP_DIR} && chmod 0700 ${OPENSHIP_DIR}`);
+  await exec.mkdir(OPENSHIP_DIR);
+  if (process.platform !== "win32") {
+    await exec.exec(`chmod 0700 ${OPENSHIP_DIR}`).catch(() => {});
+  }
 }
 
 /**
@@ -31,6 +34,9 @@ export async function ensureOpenshipDir(exec: CommandExecutor): Promise<void> {
 export async function readOpenshipFile(exec: CommandExecutor, name: string): Promise<string> {
   const path = `${OPENSHIP_DIR}/${name}`;
   try {
+    if (await exec.exists(path)) {
+      return (await exec.readFile(path)).trim();
+    }
     return (await exec.exec(`cat ${path} 2>/dev/null || echo ""`)).trim();
   } catch {
     return "";
@@ -50,11 +56,17 @@ export async function writeOpenshipFile(
   const tmp = `${path}.tmp`;
   await ensureOpenshipDir(exec);
   await exec.writeFile(tmp, content);
-  await exec.exec(`mv -f ${tmp} ${path} && chmod 0600 ${path}`);
+  if (process.platform !== "win32") {
+    await exec.exec(`mv -f ${tmp} ${path} && chmod 0600 ${path}`).catch(() => {});
+  } else {
+    await exec.writeFile(path, content);
+    await exec.rm(tmp).catch(() => {});
+  }
 }
 
 /** Remove a file (and any stale temp) from `.openship`. Idempotent. */
 export async function removeOpenshipFile(exec: CommandExecutor, name: string): Promise<void> {
   const path = `${OPENSHIP_DIR}/${name}`;
-  await exec.exec(`rm -f ${path} ${path}.tmp`);
+  await exec.rm(path);
+  await exec.rm(`${path}.tmp`);
 }

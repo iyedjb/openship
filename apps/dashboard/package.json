@@ -4,7 +4,7 @@
   "license": "Apache-2.0",
   "private": true,
   "scripts": {
-    "dev": "ENV_FILE=.env node --import ./scripts/load-env.mjs node_modules/next/dist/bin/next dev",
+    "dev": "node --import ./scripts/load-env.mjs node_modules/next/dist/bin/next dev -H localhost --port 3001",
     "dev:saas": "ENV_FILE=.env.saas node --import ./scripts/load-env.mjs node_modules/next/dist/bin/next dev",
     "dev:local-saas": "ENV_FILE=.env.local-saas node --import ./scripts/load-env.mjs node_modules/next/dist/bin/next dev",
     "dev:fresh": "rm -rf .next/cache && ENV_FILE=.env node --import ./scripts/load-env.mjs node_modules/next/dist/bin/next dev",

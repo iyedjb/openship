@@ -104,7 +104,10 @@ export function MailSetupForm({
             <input
               type="text"
               value={domain}
-              onChange={(e) => onDomainChange(e.target.value)}
+              onChange={(e) => {
+                const cleaned = e.target.value.replace(/^https?:\/\//i, "").replace(/\/.*$/, "").trim();
+                onDomainChange(cleaned);
+              }}
               placeholder={t.emails.setup.domainPlaceholder}
               className="w-full px-3 py-2.5 rounded-xl border border-border bg-background text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
             />

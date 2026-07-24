@@ -64,6 +64,8 @@ interface OverviewTabProps {
   onRefresh: () => void;
 }
 
+import { ApiKeyIntegrationCard } from "./api-key-card";
+
 export function OverviewTab({ status, serverId }: OverviewTabProps) {
   const domain = status.domain ?? "";
   const mailHost = domain ? `mail.${domain}` : "";
@@ -76,6 +78,7 @@ export function OverviewTab({ status, serverId }: OverviewTabProps) {
           serverId={serverId}
           webmail={status.webmail}
         />
+        <ApiKeyIntegrationCard domain={domain} serverId={serverId} />
         <SetupGuidesBanner />
       </div>
 
