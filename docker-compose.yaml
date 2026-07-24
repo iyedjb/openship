@@ -42,8 +42,8 @@ services:
       context: .
       dockerfile: apps/api/Dockerfile
     restart: unless-stopped
-    ports:
-      - "6660:6660"
+    expose:
+      - "6660"
     env_file:
       - .env
     environment:
@@ -70,8 +70,8 @@ services:
       context: .
       dockerfile: apps/dashboard/Dockerfile
     restart: unless-stopped
-    ports:
-      - "6661:6661"
+    expose:
+      - "6661"
     env_file:
       - .env
     environment:
@@ -89,8 +89,8 @@ services:
       context: .
       dockerfile: apps/web/Dockerfile
     restart: unless-stopped
-    ports:
-      - "6662:6662"
+    expose:
+      - "6662"
     environment:
       NODE_ENV: production
       PORT: "6662"
