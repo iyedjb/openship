@@ -1,9 +1,9 @@
 export const DEFAULT_PORT = {
-  web: 3000,
-  dashboard: 3001,
-  api: 4000,
-  saasDashboard: 3002,
-  saasApi: 4100,
+  web: 6662,
+  dashboard: 6661,
+  api: 6660,
+  saasDashboard: 6663,
+  saasApi: 6664,
 } as const;
 
 const localhost = (port: number) => `http://localhost:${port}`;
