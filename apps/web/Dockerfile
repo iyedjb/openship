@@ -1,5 +1,5 @@
 # ─── Build stage ────────────────────────────────────────
-FROM oven/bun:latest AS builder
+FROM oven/bun:1.3.10 AS builder
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 
@@ -9,7 +9,7 @@ COPY packages/ ./packages/
 COPY apps/ ./apps/
 
 RUN --mount=type=cache,target=/tmp/bun-cache \
-    BUN_INSTALL_CACHE_DIR=/tmp/bun-cache bun install \
+    BUN_INSTALL_CACHE_DIR=/tmp/bun-cache bun install --frozen-lockfile \
  && cd apps/web && bun run build
 
 # ─── Production stage ──────────────────────────────────
