@@ -9,7 +9,9 @@ COPY tsconfig.base.json ./
 COPY packages/ ./packages/
 COPY apps/ ./apps/
 
-RUN bun install && cd apps/web && bun run build
+RUN --mount=type=cache,target=/root/.bun/install/cache \
+    bun install || bun install \
+ && cd apps/web && bun run build
 
 # ─── Production stage ──────────────────────────────────
 FROM node:22-alpine AS runner
