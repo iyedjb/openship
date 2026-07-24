@@ -1,0 +1,101 @@
+# ──────────────────────────────────────────────────────────
+# Openship — Docker Compose
+# ──────────────────────────────────────────────────────────
+
+services:
+  # ─── Database (storage, private) ──────────────────────
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-openship}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-openship}
+      POSTGRES_DB: ${POSTGRES_DB:-openship}
+    expose:
+      - "5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-openship} -d ${POSTGRES_DB:-openship}"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  # ─── Cache / Queue / Rate-limit (private) ─────────────
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    expose:
+      - "6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  # ─── API (control plane) ──────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "6660:6660"
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      PORT: "6660"
+      HOSTNAME: "0.0.0.0"
+      DATABASE_URL: postgresql://${POSTGRES_USER:-openship}:${POSTGRES_PASSWORD:-openship}@postgres:5432/${POSTGRES_DB:-openship}
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "bun -e \"fetch('http://127.0.0.1:6660/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 40s
+
+  # ─── Dashboard (app UI) ───────────────────────────────
+  dashboard:
+    build:
+      context: .
+      dockerfile: apps/dashboard/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "6661:6661"
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      PORT: "6661"
+      HOSTNAME: "0.0.0.0"
+      INTERNAL_API_URL: http://api:6660
+    depends_on:
+      api:
+        condition: service_healthy
+
+  # ─── Web / Landing ────────────────────────────────────
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "6662:6662"
+    environment:
+      NODE_ENV: production
+      PORT: "6662"
+      HOSTNAME: "0.0.0.0"
+
+volumes:
+  postgres_data:
+  redis_data:
