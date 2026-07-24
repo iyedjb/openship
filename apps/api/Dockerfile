@@ -3,7 +3,6 @@
 # Pin bun (was :latest — non-deterministic; drifted to 1.3.14) to .bun-version.
 FROM oven/bun:1.3.10 AS builder
 WORKDIR /app
-ENV NODE_ENV=development
 
 COPY package.json bun.lock pnpm-workspace.yaml ./
 COPY tsconfig.base.json ./

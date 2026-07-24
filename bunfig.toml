@@ -1,0 +1,5 @@
+# Bun configuration for Openship monorepo
+# Always install devDependencies (needed for build tools like tsup, typescript, next)
+# regardless of NODE_ENV so Docker builds work correctly with NODE_ENV=production.
+[install]
+production = false

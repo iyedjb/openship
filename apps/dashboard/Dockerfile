@@ -1,7 +1,6 @@
 # ─── Build stage ────────────────────────────────────────
 FROM oven/bun:latest AS builder
 WORKDIR /app
-ENV NODE_ENV=development
 ENV NEXT_TELEMETRY_DISABLED=1
 # Same-origin API proxy (browser → /api/proxy/* → INTERNAL_API_URL). Baked at
 # build time (NEXT_PUBLIC_* is inlined) so the dashboard never calls a hardcoded
