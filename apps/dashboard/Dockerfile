@@ -23,5 +23,7 @@ COPY --from=builder /app/apps/dashboard/.next/static ./apps/dashboard/.next/stat
 COPY --from=builder /app/apps/dashboard/public ./apps/dashboard/public
 
 ENV NODE_ENV=production
-EXPOSE 3001
+ENV PORT=6661
+ENV HOSTNAME=0.0.0.0
+EXPOSE 6661
 CMD ["node", "apps/dashboard/server.js"]

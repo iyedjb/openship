@@ -41,5 +41,7 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/apps/api ./apps/api
 
 ENV NODE_ENV=production
-EXPOSE 4000
+ENV PORT=6660
+ENV HOSTNAME=0.0.0.0
+EXPOSE 6660
 CMD ["bun", "run", "apps/api/dist/index.js"]
