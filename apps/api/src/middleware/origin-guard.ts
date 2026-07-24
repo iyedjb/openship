@@ -42,14 +42,15 @@ export async function originGuard(c: Context, next: Next) {
   const isTrusted = trustedOrigins.some((t) => t.replace(/\/+$/, "") === originClean);
 
   if (!isTrusted) {
-    const reqHost = c.req.header("host");
-    const originHost = originClean.replace(/^https?:\/\//, "");
-    if (!reqHost || (reqHost !== originHost && !reqHost.startsWith(originHost))) {
-      return c.json(
-        { error: "Origin not allowed", code: "ORIGIN_REJECTED" },
-        403,
-      );
+    const fwdHost = (c.req.header("x-forwarded-host") ?? c.req.header("host") ?? "").split(":")[0];
+    const originHost = originClean.replace(/^https?:\/\//, "").split(":")[0];
+    if (fwdHost && originHost && (fwdHost === originHost || fwdHost.endsWith(originHost) || originHost.endsWith(fwdHost))) {
+      return next();
     }
+    return c.json(
+      { error: "Origin not allowed", code: "ORIGIN_REJECTED" },
+      403,
+    );
   }
 
   return next();

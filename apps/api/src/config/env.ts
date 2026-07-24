@@ -519,20 +519,30 @@ const extraTrustedOrigins = (env.OPENSHIP_EXTRA_TRUSTED_ORIGINS ?? "")
   .map((o) => o.trim())
   .filter(Boolean);
 
+const rawOrigins = [
+  runtimeTarget.dashboard,
+  runtimeTarget.api,
+  ...(env.OPENSHIP_PUBLIC_URL ? [env.OPENSHIP_PUBLIC_URL.replace(/\/+$/, "")] : []),
+  ...(env.BETTER_AUTH_URL ? [env.BETTER_AUTH_URL.replace(/\/+$/, "")] : []),
+  ...extraTrustedOrigins,
+  ...(env.NODE_ENV === "production"
+    ? []
+    : [LOCAL_WEB_URL, ...dashboardRuntimeOrigins]),
+];
+
 export const trustedOrigins = [
-  ...new Set([
-    runtimeTarget.dashboard,
-    runtimeTarget.api,
-    // Public serving (openship up --public-url): the browser's origin is the
-    // operator's public URL, so it must be trusted for CORS, the origin guard,
-    // and Better Auth's login CSRF check — otherwise remote login is rejected.
-    ...(env.OPENSHIP_PUBLIC_URL ? [env.OPENSHIP_PUBLIC_URL.replace(/\/+$/, "")] : []),
-    ...(env.BETTER_AUTH_URL ? [env.BETTER_AUTH_URL.replace(/\/+$/, "")] : []),
-    ...extraTrustedOrigins,
-    ...(env.NODE_ENV === "production"
-      ? []
-      : [LOCAL_WEB_URL, ...dashboardRuntimeOrigins]),
-  ]),
+  ...new Set(
+    rawOrigins.flatMap((o) => {
+      const clean = o.replace(/\/+$/, "");
+      if (clean.startsWith("https://")) {
+        return [clean, clean.replace("https://", "http://")];
+      }
+      if (clean.startsWith("http://")) {
+        return [clean, clean.replace("http://", "https://")];
+      }
+      return [clean];
+    })
+  ),
 ];
 
 /**
