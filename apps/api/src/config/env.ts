@@ -527,6 +527,7 @@ export const trustedOrigins = [
     // operator's public URL, so it must be trusted for CORS, the origin guard,
     // and Better Auth's login CSRF check — otherwise remote login is rejected.
     ...(env.OPENSHIP_PUBLIC_URL ? [env.OPENSHIP_PUBLIC_URL.replace(/\/+$/, "")] : []),
+    ...(env.BETTER_AUTH_URL ? [env.BETTER_AUTH_URL.replace(/\/+$/, "")] : []),
     ...extraTrustedOrigins,
     ...(env.NODE_ENV === "production"
       ? []

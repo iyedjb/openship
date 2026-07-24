@@ -38,11 +38,18 @@ export async function originGuard(c: Context, next: Next) {
     return next();
   }
 
-  if (!trustedOrigins.includes(origin)) {
-    return c.json(
-      { error: "Origin not allowed", code: "ORIGIN_REJECTED" },
-      403,
-    );
+  const originClean = origin.replace(/\/+$/, "");
+  const isTrusted = trustedOrigins.some((t) => t.replace(/\/+$/, "") === originClean);
+
+  if (!isTrusted) {
+    const reqHost = c.req.header("host");
+    const originHost = originClean.replace(/^https?:\/\//, "");
+    if (!reqHost || (reqHost !== originHost && !reqHost.startsWith(originHost))) {
+      return c.json(
+        { error: "Origin not allowed", code: "ORIGIN_REJECTED" },
+        403,
+      );
+    }
   }
 
   return next();
