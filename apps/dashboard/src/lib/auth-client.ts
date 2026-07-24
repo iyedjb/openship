@@ -10,7 +10,7 @@ import { getAuthBaseUrl } from "@/lib/api/urls";
  */
 const AUTH_BASE_URL = getAuthBaseUrl();
 
-export const authClient = createAuthClient({
+export const authClient: any = createAuthClient({
   baseURL: AUTH_BASE_URL,
   fetchOptions: {
     credentials: "include",
